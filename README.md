@@ -1,7 +1,7 @@
 # my QML component
-Extention of native QML component: Loader
 
 ## LoaderStack
+Extention of native QML component: Loader
 ### Changed behavior (diff to native Loader): ##
 * Can load multiple QML components, each component live cycle driven by component self or JavaScript handler
 * property 'asynchronous' always is true
