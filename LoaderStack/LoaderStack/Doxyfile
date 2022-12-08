@@ -1,0 +1,5 @@
+# https://invent.kde.org/sdk/doxyqml/
+OUTPUT_DIRECTORY       = ../DOCS
+FILTER_PATTERNS = *.qml=doxyqml
+FILE_PATTERNS = *.qml
+EXTENSION_MAPPING = qml=C++
