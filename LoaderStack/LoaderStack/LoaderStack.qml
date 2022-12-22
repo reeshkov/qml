@@ -143,7 +143,14 @@ Item{
                     finishCreation();
                 }
             }
-            function unLoad(oparent){
+            function unLoad(handler){
+                if("function"===typeof handler){
+                    var handlerWrapper = function(){
+                        componentInterface.unLoaded.disconnect(handlerWrapper);
+                        handler();
+                    };
+                    componentInterface.unLoaded.connect(handlerWrapper);
+                }
                 componentInterface.destroy();
             }
             WorkerScript {
@@ -180,7 +187,8 @@ Item{
         if(active){
             if("string"===typeof source && ""!=source){
                 var page = {}, object;
-                if(properties) page.properties = properties;
+                if(properties) { page.properties = properties; }
+                else { page.properties = {"width": loader.width, "height": loader.height}; }
                 page.source = source;
                 console.log("LoaderStack.qml component.createObject: "+JSON.stringify(page));
                 return component.createObject(loader, page);
@@ -197,6 +205,7 @@ Item{
         source: "LoaderStack.qml.js"
         onMessage: {
             console.log("LoaderStack.qml unLoadAll()" );
+            var handler = function(){};
             Array.prototype.filter.call(loader.children, function(o){
                 if( o.hasOwnProperty("unLoad") && 'function' === typeof o.unLoad ){
                     console.log("LoaderStack.qml unLoad: "+o);
@@ -204,10 +213,18 @@ Item{
                 }
                 return false;
             });
+            if("function"===typeof unLoadAll.handler){
+                handler = unLoadAll.handler;
+                delete unLoadAll.handler;
+                handler();
+            }
             //qml.clearCache();
         }
     }
-    function unLoadAll(){
+    function unLoadAll(handler){
+        if("function"===typeof handler){
+            unLoadAll.handler = handler;
+        }
         unLoadAsync.sendMessage({});
     }
 
