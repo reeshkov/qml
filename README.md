@@ -3,6 +3,9 @@
 ## LoaderStack ##
 Alternative of native QML component: Loader
 
+### dev branch 'LoaderStack': ###
+`git clone https://github.com/reeshkov/qml.git && git switch LoaderStack`
+
 ### Changed behavior (diff to native Loader): ###
 * Can load multiple QML components, each component live cycle driven by component self or JavaScript handler
 * property 'asynchronous' always is true
@@ -35,5 +38,5 @@ LoaderStack {
 }
 ```
 
-### dev branch 'LoaderStack': ###
-`git clone https://github.com/reeshkov/qml.git && git switch LoaderStack`
+### Example of use: ###
+https://github.com/reeshkov/games4child
