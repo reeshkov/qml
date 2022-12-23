@@ -71,14 +71,29 @@ Item{
     */
     signal loaded()
 
+
+    /*!
+    This property holds length of stack
+    0 - unlimited
+    more than 1 - next overflow loading destroy oldest item in the stack
+    */
+    property int maximumStackLength: 0
+
     onChildrenChanged: {
-        if(0 < loader.children.length){
-            loader.item = loader.children[loader.children.length-1];
+        var items = Array.prototype.filter.call(loader.children, function(o){ return o.hasOwnProperty("unLoad") && 'function' === typeof o.unLoad; }),
+        len = items.length,
+        overflow = 0 < loader.maximumStackLength && loader.maximumStackLength < len;
+        //console.log("loader onChildrenChanged overflow="+overflow+" loader.maximumStackLength="+loader.maximumStackLength+" loader.children.length="+loader.children.length);
+        if(overflow){
+            items[0].unLoad();
+            return;
+        }
+        if(0 < len){
+            loader.item = items[len-1];
         }else{
             loader.item = null;
             loader.status = Loader.Null;
             loader.source = "";
-            //componentInterface.unLoad(); // make assurance doubly sure
         }
     }
 
@@ -93,7 +108,7 @@ Item{
             property string source: ""
             property variant properties: ({})
             // extended interface:
-            signal loaded()  // Page loaded
+            signal loaded(variant item)  // Page loaded
             signal error(string error_string) // Page error or not loaded
             signal unLoaded() // Page unloaded
             signal input(variant data) // Data from page i.e. user input
@@ -115,9 +130,9 @@ Item{
                         if (Component.Ready === pageFabric.status ) {
                             try{
                                 object = pageFabric.createObject(componentInterface, properties);
-                                console.log("componentInterface loaded "+object.width+"x"+object.height/*+obj2str(object, "object")*/);
+                                //console.log("componentInterface loaded "+object.width+"x"+object.height/*+obj2str(object, "object")*/);
                                 loader.source = source;
-                                componentInterface.loaded();
+                                componentInterface.loaded(object);
                             }catch(e){
                                 console.log("componentInterface error "+e);
                                 componentInterface.error("Error page.createObject: "+e);
@@ -167,7 +182,7 @@ Item{
                 componentInterface.unLoaded();
             }
             onChildrenChanged: {
-                console.log("componentInterface onChildrenChanged "+componentInterface.children.length);
+                //console.log("componentInterface onChildrenChanged "+componentInterface.children.length);
                 if(0 >= componentInterface.children.length){ // handle self destroyed component
                     componentInterface.unLoad();
                 }
