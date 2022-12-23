@@ -12,10 +12,11 @@ import "../LoaderStack"
 //Item { // when use QQmlEngine
 Window{ // when use QQmlApplicationEngine
     id: root
-//    width: 640
-//    height: 480
-    visible: true
     //anchors.fill: parent
+    width: 1024
+    height: 768
+
+    visible: true
 
     property string appUrl: "http://localhost:8000/loadedComponent.qml"
     property string errUrl: "http://localhost:8000/errorComponent.qml"
@@ -25,13 +26,26 @@ Window{ // when use QQmlApplicationEngine
         id: loader
         width: parent.width/2
         height: parent.height
-        onStatusChanged: if (loader.status == Loader.Ready){ console.log('Loader loaded component'); }
+        onStatusChanged: {
+            if (loader.status == Loader.Ready){ console.log('Loader loaded component'); }
+        }
         Component.onCompleted: {
             if(loader.hasOwnProperty('asynchronous')){ asynchronous = true; }
         }
+        onLoaded: {
+            console.log("loader onLoaded handler");
+        }
         signal input(variant data) // Data from page i.e. user input
         onInput: {
-            console.log("loader input handler "+JSON.stringify(data));
+            console.log("loader onInput handler "+JSON.stringify(data));
+        }
+        signal error(string error_string) //
+        onError: {
+            console.log("loader onError handler "+JSON.stringify(data));
+        }
+        signal unLoaded(variant data) //
+        onUnLoaded: {
+            console.log("loader unLoaded handler "+JSON.stringify(data));
         }
     }
 
@@ -48,9 +62,9 @@ Window{ // when use QQmlApplicationEngine
         // Loader
         console.log("test sync loader.source=...");
         start = new Date().getTime();
-        loader.source = appUrl;
+        loader.source = tmpUrl;
         console.log('Loader execution time = ' + (new Date().getTime() - start));
-
+/*
         console.log("test async: loader.setSource...");
         start = new Date().getTime();
         page = loader.setSource(appUrl, { "color": "blue", "objectName":"Loader_second" });
@@ -187,6 +201,6 @@ Window{ // when use QQmlApplicationEngine
                 });
             });
         });
-
+*/
     } // Component.onCompleted
 }
